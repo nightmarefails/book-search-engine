@@ -16,8 +16,8 @@ const resolvers = {
 
             return { token, user}
         },
-        login: async (parent, {username, password}) => {
-            const user = User.findOne({ username });
+        login: async (parent, {email, password}) => {
+            const user = User.findOne({ email });
 
             if(!user) {
                 throw new AuthenticationError("Invalid Username or Password")
