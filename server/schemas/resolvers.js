@@ -4,34 +4,40 @@ const { signToken } = require('../utils/auth');
 
 const resolvers = {
     Query: {
-        user: async (parent, { _id }) => {
-            const params = _id ? { _id } : {};
-            return User.find(params);
-        }
+        user: async (parent, args) => {
+            try {
+                return await User.findOne({ username: args.username });
+            } catch (error) {
+                console.log(error);
+            }
+        }   
     },
     Mutation: {
-        addUser: async (parent, { username, email, password}) => {
-            const user = await User.create({ username, email, password});
-            const token = signToken(user);
-
-            return { token, user}
+        addUser: async (parent, { username, email, password }) => {
+            try {
+                const user = await User.create({ username, email, password });
+                const token = signToken(user);
+                return { token, user }
+            } catch (error) {
+                console.error(error);
+            }
         },
-        login: async (parent, {email, password}) => {
-            const user = User.findOne({ email });
+        loginUser: async (parent, { email, password }) => {
+            const user = await User.findOne({ email });
 
-            if(!user) {
-                throw new AuthenticationError("Invalid Username or Password")
+            if (!user) {
+                throw new AuthenticationError("Invalid Username")
             }
 
             const correctPw = await user.isCorrectPassword(password)
 
-            if(correctPw) {
-                throw new AuthenticationError('Incorrect Username or Password')
-            
+            if (correctPw) {
+                throw new AuthenticationError('Incorrect Password')
+
             }
 
             const token = signToken(user)
-            return { token, user}
+            return { token, user }
         },
         addBook: async (parent, args) => {
             return User.findOneAndUpdate(
@@ -48,7 +54,7 @@ const resolvers = {
         removeBook: async (parent, args) => {
             return User.findOneAndUpdate(
                 { _id: args.userId },
-                { $pull: {savedBooks: args} },
+                { $pull: { savedBooks: args } },
                 { new: true }
             )
         }
