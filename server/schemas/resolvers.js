@@ -1,16 +1,16 @@
 const { AuthenticationError } = require('apollo-server-errors');
 const { User } = require('../models');
-const { signToken } = require('../utils/auth');
+const { signToken,  } = require('../utils/auth');
 
 const resolvers = {
     Query: {
-        user: async (parent, args) => {
+        user: async (parent, args, context) => {
             try {
-                return await User.findOne({ username: args.username });
+                return await User.findOne({ username: context.user.username });
             } catch (error) {
                 console.log(error);
             }
-        }   
+        }
     },
     Mutation: {
         addUser: async (parent, { username, email, password }) => {
@@ -22,22 +22,24 @@ const resolvers = {
                 console.error(error);
             }
         },
-        loginUser: async (parent, { email, password }) => {
-            const user = await User.findOne({ email });
+        loginUser: async (parent, args) => {
+            try {
+                const user = await User.findOne({ $or: [{ username: args.username }, { email: args.email }] });
+                if (!user) {
+                    return new AuthenticationError("Invalid Username or E-mail");
+                }
 
-            if (!user) {
-                throw new AuthenticationError("Invalid Username")
+                const correctPw = await user.isCorrectPassword(args.password);
+
+                if (!correctPw) {
+                    return new AuthenticationError("Invalid Password");
+                }
+
+                const token = signToken(user)
+                return { token, user }
+            } catch (err) {
+                console.log(err)
             }
-
-            const correctPw = await user.isCorrectPassword(password)
-
-            if (correctPw) {
-                throw new AuthenticationError('Incorrect Password')
-
-            }
-
-            const token = signToken(user)
-            return { token, user }
         },
         addBook: async (parent, args) => {
             return User.findOneAndUpdate(
