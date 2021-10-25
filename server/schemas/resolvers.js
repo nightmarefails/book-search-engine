@@ -41,9 +41,9 @@ const resolvers = {
                 console.log(err)
             }
         },
-        addBook: async (parent, args) => {
+        addBook: async (parent, args, context) => {
             return User.findOneAndUpdate(
-                { _id: args.userId },
+                { username: context.user.username },
                 {
                     $addToSet: { savedBooks: args },
                 },
@@ -53,10 +53,10 @@ const resolvers = {
                 }
             )
         },
-        removeBook: async (parent, args) => {
+        removeBook: async (parent, args, context) => {
             return User.findOneAndUpdate(
-                { _id: args.userId },
-                { $pull: { savedBooks: args } },
+                { username: context.user.username },
+                { $pull: { savedBooks: { bookId: args.bookId } } },
                 { new: true }
             )
         }
