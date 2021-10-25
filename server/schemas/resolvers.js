@@ -23,6 +23,7 @@ const resolvers = {
             }
         },
         loginUser: async (parent, args) => {
+            console.log(args);
             try {
                 const user = await User.findOne({ $or: [{ username: args.username }, { email: args.email }] });
                 if (!user) {
@@ -42,6 +43,7 @@ const resolvers = {
             }
         },
         addBook: async (parent, args, context) => {
+            console.log(args)
             return User.findOneAndUpdate(
                 { username: context.user.username },
                 {
