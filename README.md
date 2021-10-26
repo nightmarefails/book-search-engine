@@ -12,11 +12,11 @@ Users can start by clicking sign in/up and signup for an account. Once they have
 
 ## Website
 ### Main Page:
-![MainPage](assets\images\savedScreen.png)
+![MainPage](./assets/images/savedScreen.png)
 ### Login/Signup:
-![Login Menu](assets\images\signupScreen.png)
+![Login Menu](./assets/images/signupScreen.png)
 ### Saved Books Page:
-![Saved Books](assets\images\savedScreen.png)
+![Saved Books](./assets/images/savedScreen.png)
 
 Deployed Website:
 https://blooming-falls-30989.herokuapp.com/
